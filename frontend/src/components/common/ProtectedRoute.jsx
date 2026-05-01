@@ -1,0 +1,11 @@
+// Redirects unauthenticated users back to /login
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+
+const ProtectedRoute = ({ children }) => {
+    const { isLoggedIn } = useSelector((state) => state.auth);
+    if (!isLoggedIn) return <Navigate to="/login" replace />;
+    return children;
+};
+
+export default ProtectedRoute;
