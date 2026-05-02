@@ -21,10 +21,18 @@ const app = express()
 // Middleware
 // cors allows frontend to communicate with backend
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    process.env.FRONTEND_URL
-  ],
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      "http://localhost:5173",
+      process.env.FRONTEND_URL
+    ]
+    // Allow requests with no origin (Postman, mobile apps)
+    if (!origin) return callback(null, true)
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true)
+    }
+    return callback(new Error("Not allowed by CORS"))
+  },
   credentials: true
 }))
 
