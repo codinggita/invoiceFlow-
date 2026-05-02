@@ -7,16 +7,27 @@ import User from '../models/User.js'
 
 // Helper function to generate unique invoice number
 // Format: INV-0001, INV-0002 etc based on user prefix
+// ✅ Fixed - finds the last invoice number and increments it
 const generateInvoiceNumber = async (userId) => {
   const user = await User.findById(userId)
   const prefix = user.invoicePrefix || 'INV-'
-  
-  // Count how many invoices this user already has
-  const count = await Invoice.countDocuments({ userId })
-  
-  // Pad number with zeros: 1 becomes 0001
-  const number = String(count + 1).padStart(4, '0')
-  return `${prefix}${number}`
+
+  // Find the last created invoice for this user
+  const lastInvoice = await Invoice.findOne({ userId })
+    .sort({ createdAt: -1 })
+    .select('invoiceNumber')
+
+  if (!lastInvoice) {
+    // No invoices yet, start from 0001
+    return `${prefix}0001`
+  }
+
+  // Extract number from last invoice number e.g. INV-0003 → 3
+  const lastNumber = parseInt(lastInvoice.invoiceNumber.replace(prefix, ''), 10)
+
+  // Increment and pad with zeros
+  const nextNumber = String(lastNumber + 1).padStart(4, '0')
+  return `${prefix}${nextNumber}`
 }
 
 // @route   GET /api/invoices
