@@ -1,7 +1,7 @@
 // Central API utility — all fetch calls go through here
 // Uses JWT token stored in localStorage for protected routes
 
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 // Get saved token from localStorage
 const getToken = () => localStorage.getItem("token");
