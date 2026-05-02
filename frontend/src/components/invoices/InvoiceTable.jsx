@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 import StatusBadge from "../common/StatusBadge";
 
 // Reusable invoice table used in Dashboard and InvoiceList
-// Uses MongoDB _id for navigation and deletion
 const InvoiceTable = ({ invoices, onDelete, showSelection = false }) => {
   const navigate = useNavigate();
 
@@ -64,13 +63,16 @@ const InvoiceTable = ({ invoices, onDelete, showSelection = false }) => {
           ) : (
             invoices.map((invoice) => (
               <TableRow key={invoice._id} hover>
-                {showSelection && <TableCell padding="checkbox"><Checkbox /></TableCell>}
-                {/* Invoice number from backend field */}
+                {showSelection && (
+                  <TableCell padding="checkbox"><Checkbox /></TableCell>
+                )}
                 <TableCell>{invoice.invoiceNumber}</TableCell>
-                {/* Client may be populated object or plain string */}
+
+                {/* ✅ Fixed: clientId is populated object from backend */}
                 <TableCell>
-                  {invoice.client?.name || invoice.client || "—"}
+                  {invoice.clientId?.fullName || "—"}
                 </TableCell>
+
                 <TableCell>{formatDate(invoice.issueDate)}</TableCell>
                 <TableCell>{formatDate(invoice.dueDate)}</TableCell>
                 <TableCell>{formatAmount(invoice.totalAmount)}</TableCell>
@@ -78,15 +80,12 @@ const InvoiceTable = ({ invoices, onDelete, showSelection = false }) => {
                   <StatusBadge status={invoice.status} />
                 </TableCell>
                 <TableCell align="right">
-                  {/* View detail */}
                   <IconButton onClick={() => navigate(`/invoices/${invoice._id}`)}>
                     <VisibilityOutlined />
                   </IconButton>
-                  {/* Edit invoice */}
                   <IconButton onClick={() => navigate(`/invoices/${invoice._id}/edit`)}>
                     <EditOutlined />
                   </IconButton>
-                  {/* Delete with confirm */}
                   {onDelete && (
                     <IconButton color="error" onClick={() => handleDelete(invoice._id)}>
                       <DeleteOutline />

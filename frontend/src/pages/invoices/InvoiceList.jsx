@@ -39,9 +39,11 @@ const InvoiceList = () => {
   }, [dispatch]);
 
   // Filter invoices by search query and active status tab (no extra API call)
+
   const filtered = useMemo(() => {
     return invoices.filter((inv) => {
-      const clientName = inv.client?.name || String(inv.client || "");
+      // ✅ Fixed: clientId is populated object, read fullName from it
+      const clientName = inv.clientId?.fullName || "";
       const matchesQuery =
         (inv.invoiceNumber || "").toLowerCase().includes(query.toLowerCase()) ||
         clientName.toLowerCase().includes(query.toLowerCase());
