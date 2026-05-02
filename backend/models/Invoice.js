@@ -41,12 +41,12 @@ const invoiceSchema = new mongoose.Schema(
       required: true,
     },
     // Auto generated invoice number like INV-0001
+    // ✅ Correct - unique per user only
     invoiceNumber: {
       type: String,
       required: true,
-      unique: true,
     },
-    issueDate: {
+     issueDate: {
       type: Date,
       required: true,
     },
