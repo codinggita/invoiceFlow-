@@ -1,17 +1,17 @@
 // Main server file - entry point of the backend
 // Sets up express app, middleware, routes and starts server
 
+import dotenv from 'dotenv'
+// Load environment variables from .env file before other imports
+dotenv.config()
+
 import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
-import dotenv from 'dotenv'
 import connectDB from './config/db.js'
 import authRoutes from './routes/authRoutes.js'
 import clientRoutes from './routes/clientRoutes.js'
 import invoiceRoutes from './routes/invoiceRoutes.js'
-
-// Load environment variables from .env file
-dotenv.config()
 
 // Connect to MongoDB database
 connectDB()
@@ -20,7 +20,13 @@ const app = express()
 
 // Middleware
 // cors allows frontend to communicate with backend
-app.use(cors())
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    process.env.FRONTEND_URL
+  ],
+  credentials: true
+}))
 
 // express.json allows us to receive JSON data in requests
 app.use(express.json())
