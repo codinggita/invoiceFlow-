@@ -48,11 +48,12 @@ const EditInvoice = () => {
       items: invoice.items?.length
         ? invoice.items.map((item) => ({
           description: item.description || "",
-          qty: item.qty || 1,
+          // Use quantity from backend (returned by our API)
+          qty: item.quantity || 1,
           unitPrice: item.unitPrice || 0,
         }))
         : [{ description: "", qty: 1, unitPrice: 0 }],
-      tax: invoice.tax ?? 0,
+      taxRate: invoice.taxRate ?? 0,
       discount: invoice.discount ?? 0,
       notes: invoice.notes || "",
       terms: invoice.terms || "",
@@ -63,17 +64,25 @@ const EditInvoice = () => {
       dueDate: "",
       clientId: "",
       items: [{ description: "", qty: 1, unitPrice: 0 }],
-      tax: 0, discount: 0, notes: "", terms: "",
+      taxRate: 0, discount: 0, notes: "", terms: "",
     };
 
   // Submit updates the invoice via API
   const handleSubmit = async (values) => {
+    // Map form items to backend format
+    const fixedItems = values.items.map((item) => ({
+      description: item.description,
+      quantity: Number(item.qty),
+      unitPrice: Number(item.unitPrice),
+      total: Number(item.qty) * Number(item.unitPrice),
+    }));
+
     const payload = {
-      client: values.clientId,
+      clientId: values.clientId,
       issueDate: values.issueDate,
       dueDate: values.dueDate,
-      items: values.items,
-      tax: Number(values.tax),
+      items: fixedItems,
+      taxRate: Number(values.taxRate),
       discount: Number(values.discount),
       notes: values.notes,
       terms: values.terms,
